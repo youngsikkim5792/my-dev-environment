@@ -1,62 +1,68 @@
-# My Development Environment
+﻿# 개발 워크스테이션 구축
 
-## 1. 프로젝트 목적
-Windows 환경에서 개발에 필요한 도구를 설치하고 사용법을 익히기 위한 프로젝트입니다.
+## 1. 프로젝트 개요
+Windows, Linux CLI, Docker, Git/GitHub를 이용하여 재현 가능한 개발 환경을 구축하고 검증한 프로젝트입니다.
 
-## 2. 개발 환경
-- 운영체제: Windows 11 Pro
-- 터미널: Windows PowerShell
-- Linux 환경: WSL 2 / Ubuntu
-- 버전 관리: Git
-- 코드 편집기: Visual Studio Code
-- 컨테이너 환경: Docker (설치 예정)
+## 2. 실행 환경
+- OS: Windows + Docker Linux 컨테이너
+- Terminal: Windows PowerShell
+- Docker: evidence/docker-log.txt 참고
+- Git: evidence/git-log.txt 참고
 
-## 3. 진행 체크리스트
-- [x] Git 설치
-- [x] Git 사용자 이름 및 이메일 설정
-- [x] GitHub 저장소 생성
-- [x] VS Code 프로젝트 폴더 생성
-- [x] 로컬 Git 저장소 초기화
-- [x] GitHub 원격 저장소 연결
-- [x] README.md 파일 생성
-- [ ] WSL 2 정상 작동 확인
-- [ ] Docker 설치 및 실행 확인
-- [ ] Hello World 컨테이너 실행
-- [ ] Ubuntu 컨테이너 실행
-- [ ] Dockerfile로 NGINX 웹 서버 구성
-- [ ] 포트 매핑 및 브라우저 접속 확인
-- [ ] Bind Mount로 실시간 파일 변경 확인
-- [ ] Docker Volume 데이터 유지 확인
-- [ ] 문제 해결 사례 및 보안 점검 기록
+## 3. 수행 체크리스트
+- [x] 터미널 기본 명령어 실습
+- [x] 파일 및 디렉토리 권한 변경
+- [x] Docker 설치 및 점검
+- [x] hello-world 및 Ubuntu 컨테이너 실행
+- [x] Dockerfile 기반 웹 서버 이미지 빌드
+- [x] 포트 매핑 및 웹 접속
+- [x] 바인드 마운트 변경 반영
+- [x] Docker 볼륨 영속성 검증
+- [x] Git 및 GitHub 연동
 
-## 4. 자주 사용하는 명령어
+## 4. 실행 및 검증
+웹 서버 이미지 빌드:
 
-### Git
 ```powershell
-git status
-git add .
-git commit -m "설명"
-git push -u origin main
+docker build -t my-web:1.0 .
+docker run -d --name my-web-8081 -p 8081:80 my-web:1.0
+curl.exe http://localhost:8081
 ```
 
-### WSL
-```powershell
-wsl -l -v
-wsl --status
-```
+포트 매핑은 호스트의 8081 포트를 컨테이너의 80 포트에 연결합니다.
 
-### Docker
-```powershell
-docker --version
-docker run hello-world
-docker ps
-docker ps -a
-```
+### 웹 접속 증거
+![웹 서버 접속](evidence/web-8081.png)
 
-## 5. 문제 해결 기록
-문제가 발생하면 증상, 원인, 해결 방법을 기록합니다.
+### 실습 로그
+- [Docker 점검 및 운영](evidence/docker-log.txt)
+- [Linux 터미널 및 권한](evidence/terminal-log.txt)
+- [Docker 이미지 빌드](evidence/docker-build-log.txt)
+- [웹 서버 실행](evidence/web-8081-log.txt)
+- [바인드 마운트 변경 전후](evidence/bind-mount-log.txt)
+- [볼륨 영속성](evidence/volume-log.txt)
+- [Git 연동](evidence/git-log.txt)
 
-## 6. 보안 주의사항
-- 비밀번호와 액세스 토큰을 파일에 저장하지 않습니다.
-- API 키 및 개인 인증 정보를 GitHub에 올리지 않습니다.
-- GitHub에 올리기 전에 개인정보가 포함되어 있지 않은지 확인합니다.
+## 5. 트러블슈팅
+### 문제 1: 8080 포트 충돌
+- 문제: Docker 실행 중 port is already allocated 오류 발생
+- 원인 가설: 기존 프로그램 또는 컨테이너가 8080 포트를 사용 중
+- 확인: Docker 실행 오류 메시지 확인
+- 해결: 호스트 포트를 8081로 변경하여 실행
+
+### 문제 2: 한글 출력 깨짐
+- 문제: PowerShell 로그에서 한글이 깨져 표시됨
+- 원인 가설: Windows 콘솔과 파일의 문자 인코딩 불일치
+- 확인: web-log.txt의 한글 출력 확인
+- 개선 방법: UTF-8 인코딩을 사용하고 출력 환경을 통일
+
+## 6. 기술 개념
+절대 경로는 C:\Users처럼 시작 위치가 정해진 경로이며, 상대 경로는 현재 디렉토리를 기준으로 합니다.
+
+Linux 권한 r은 읽기, w는 쓰기, x는 실행을 뜻합니다. 755는 소유자 rwx, 그룹과 기타 사용자 r-x이며, 644는 소유자 rw-, 나머지 r--입니다.
+
+Docker 이미지는 실행 환경의 템플릿이고 컨테이너는 그 이미지를 실행한 인스턴스입니다.
+
+바인드 마운트는 호스트 파일 변경을 컨테이너에 반영하고, Docker 볼륨은 컨테이너 삭제 후에도 데이터를 유지합니다.
+
+Git은 로컬 버전 관리 도구이고 GitHub는 원격 저장소 및 협업 플랫폼입니다.
